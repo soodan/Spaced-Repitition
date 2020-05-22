@@ -21,6 +21,7 @@ $(function(){
         var revisionItems = [];
         var listObject = storage.listObject || [];
         listObject = listObject[0];
+        var revisionObjects = [];
         var currentDate = new Date();
         //We are only comparing dates only without time.
         currentDate.setHours(0,0,0,0);
@@ -36,10 +37,12 @@ $(function(){
                     var arrayOfNameAndLink = array[i].arrayOfNameAndLink;
                     arrayOfNameAndLink = (arrayOfNameAndLink) ? arrayOfNameAndLink : []; // null check
                     array[i].revisionDate = revisionDate.toJSON();
+                    revisionObjects.push(array[i]);
                     revisionItems = revisionItems.concat(arrayOfNameAndLink);
                 }
             }
         }
+        chrome.storage.sync.set({'revisionObjects': revisionObjects},function(){});
         // Retrieve today's list which is to be revised.
         var list = "";
         for(element of revisionItems){
@@ -47,6 +50,8 @@ $(function(){
         }
         if(list.length > 0)
             $('#revisionList').append(list);
+        else
+            $('#revisionList').append('<li>No Revision Today Yay Create your today\'s list</li>');
         // Initialize the list object if it is empty.
         if(jQuery.isEmptyObject(listObject)){
             //Add links and names to the today's list
@@ -67,26 +72,134 @@ $(function(){
             var arrayOfNameAndLink = listObject.arrayOfNameAndLink;
             if(!jQuery.isEmptyObject(arrayOfNameAndLink)) {
                 var list2 = "";
+                var remove = '&nbsp;<input type="submit" ' + ' class = "remove-me" value="Remove">'
+                var edit = '&nbsp;<input type="submit" ' + ' class = "edit-me" value="Edit">'
                 for (element of arrayOfNameAndLink) {
-                    list2 += '<li><a href =' + element[1] + ' target="_blank">' + element[0] + '</a></li>';
+                    list2 += '<li><a href =' + element[1] + ' target="_blank">' + element[0] + '</a>' + remove + edit +'</li>';
                 }
                 if (list2.length > 0)
                     $('#newList').append(list2);
             }
         }
     });
-    var arrayOfNameAndLink = [];
+
     $('#listInsert').click(function(){
+        $('.center').hide();
+        $('#show').show();
         chrome.storage.sync.get(['array', 'listObject'], function(storage) {
             var listObject = storage.listObject[0];
             var name = $('#name').val().toString(); // change if this doesnt works
+            name = name.trim();
             var link = $('#link').val().toString();
             if(!(jQuery.isEmptyObject(name) || jQuery.isEmptyObject(link))) {
                 listObject.arrayOfNameAndLink.push([name, link]);
                 chrome.storage.sync.set({'listObject': [listObject]}, function () {
                 });
-                $('#newList').append('<li><a href=' + link + '>' + name + '</a></li>');
+                var edit = '&nbsp;<input type="submit" ' + ' class = "edit-me" value="Edit">'
+                var remove = '&nbsp;<input type="submit" ' + ' class = "remove-me" value="Remove">'
+                $('#newList').append('<li><a href=' + link + ' target="_blank">' + name + '</a>' + remove + edit +'</li>');
+                $('#name').val('');
+                $('#link').val('');
             }
         });
     })
+    var entry, prevName, prevLink;
+    // ??
+    $('#editListInsert').click(function(){
+        $('.edit').hide();
+        $('#show').show();
+        var currentName = $('#editName').val().toString();
+        var currentLink = $('#editLink').val().toString();
+        currentName = currentName.trim();
+        chrome.storage.sync.get(['listObject'], function(storage){
+            var listObject = storage.listObject || [];
+            listObject = listObject[0];
+            var array = listObject.arrayOfNameAndLink || []
+            for(var i = 0; i < array.length; i++){
+                var arrayName = array[i][0];
+                if(arrayName == prevName || arrayName == undefined){
+                    array[i][0] = currentName;
+                    array[i][1] = currentLink;
+                    break;
+                }
+            }
+            var edit = '&nbsp;<input type="submit" ' + ' class = "edit-me" value="Edit">'
+            var remove = '&nbsp;<input type="submit" ' + ' class = "remove-me" value="Remove">'
+            entry.html('<li><a href=' + currentLink + ' target="_blank">' + currentName + '</a>' + remove + edit +'</li>')
+            listObject.arrayOfNameAndLink = array;
+            chrome.storage.sync.set({'listObject': [listObject]}, function(){})
+        })
+    })
+
+    $(document).ready(function () {
+        $(document).on('mouseenter', '#newList', function () {
+            $(this).find(".remove-me").show();
+            $(this).find(".edit-me").show();
+        }).on('mouseleave', '#newList', function () {
+            $(this).find(".remove-me").hide();
+            $(this).find(".edit-me").hide();
+        });
+    });
+    $('#show').on('click', function () {
+        $('.center').show();
+        $(this).hide();
+    })
+
+    $('#close').on('click', function () {
+        $('.center').hide();
+        $('#show').show();
+
+    })
+
+    $('#editClose').on('click', function (){
+        $('.edit').hide();
+        $('#show').show();
+    })
+
+
+
+    $(document).on('click', ".edit-me", function(e){
+        entry = $(this).parent();
+        var name = entry.text();
+        // removes the trailing and pre spaces
+        name = name.trim();
+        $('.edit').show();
+        $('#show').hide();
+        chrome.storage.sync.get(['listObject'], function(storage){
+            var listObject = storage.listObject || [];
+            listObject = listObject[0];
+            var array = listObject.arrayOfNameAndLink || []
+            for(var i = 0; i < array.length; i++){
+                var arrayName = array[i][0];
+                if(arrayName == name || arrayName == undefined){
+                    prevName = array[i][0];
+                    prevLink = array[i][1];
+                    $('#editName').val(array[i][0]);
+                    $('#editLink').val(array[i][1]);
+                }
+            }
+        });
+    });
+    $(document).on('click', ".remove-me", function(e){
+        var entry = $(this).parent();
+        var name = entry.text();
+        // removes the trailing and pre spaces
+        name = name.trim();
+        chrome.storage.sync.get(['listObject'], function(storage){
+            var listObject = storage.listObject || [];
+            listObject = listObject[0];
+            var array = listObject.arrayOfNameAndLink || []
+            for(var i = 0; i < array.length; i++){
+                var arrayName = array[i][0];
+                if(arrayName == name || arrayName == undefined){
+                    // removes the element then break.
+                    array.splice(i, 1);
+                    break;
+                }
+            }
+            listObject.arrayOfNameAndLink = array;
+            chrome.storage.sync.set({'listObject': [listObject]}, function(){})
+        });
+        entry.remove();
+    });
 });
