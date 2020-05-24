@@ -24,7 +24,7 @@ $(function(){
                 }
             }
             var list = "";
-            for(element of items){
+            for (element of items){
                 list += '<li><a href =' + element[1] + ' target="_blank">' + element[0] + '</a></li>';
             }
             if(list.length > 0)

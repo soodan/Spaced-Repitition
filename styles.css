@@ -1,7 +1,7 @@
 
 body{
-    min-width: 480px;
-    min-height: 600px;
+    min-width: 300px;
+    min-height: 200px;
 }
 .input{
     min-width: 300px;
@@ -29,9 +29,23 @@ body{
 h1{
     text-align: center;
 }
+.wrapper {
+    text-align: center;
+    float: bottom;
+}
+
+.button {
+    position: absolute;
+    top: 50%;
+}
 .remove-me{
     display: none;
+    alignment: right;
 }
 .edit-me{
     display: none;
+    alignment: right;
+}
+li{
+    margin: 5px;
 }

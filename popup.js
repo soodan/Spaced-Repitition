@@ -10,7 +10,9 @@ To Do:
 9. Provide user the capability to export the data from options page into a csv.
 10. Implement Context menu functionality if i select an item and right click and click on the extension it should directly add.
 11. Name and link should not be empty implement input validation.
+12. Store the listObject before inserting into the array into a csv and provide a button where user can download the csv or view the csv.
 optional
+13. Display Error messages so that user knows what he is doing wrong.
 8. Integrate Google calender api for the revision time.
  */
 
@@ -32,7 +34,6 @@ $(function(){
             array = storage.array || [];
             for(var i = 0; i < array.length; i++){
                 var revisionDate = new Date(array[i].revisionDate);
-                var originalDate = new Date(array[i].originaldate);
                 if(revisionDate.valueOf() == currentDate.valueOf()){
                     var arrayOfNameAndLink = array[i].arrayOfNameAndLink;
                     arrayOfNameAndLink = (arrayOfNameAndLink) ? arrayOfNameAndLink : []; // null check
@@ -72,20 +73,48 @@ $(function(){
             var arrayOfNameAndLink = listObject.arrayOfNameAndLink;
             if(!jQuery.isEmptyObject(arrayOfNameAndLink)) {
                 var list2 = "";
-                var remove = '&nbsp;<input type="submit" ' + ' class = "remove-me" value="Remove">'
-                var edit = '&nbsp;<input type="submit" ' + ' class = "edit-me" value="Edit">'
+                var remove = '&nbsp;<input type="submit" ' + ' class = "remove-me" value="Remove" style="float: right">'
+                var edit = '&nbsp;<input type="submit" ' + ' class = "edit-me" value="Edit" style="float: right">'
                 for (element of arrayOfNameAndLink) {
                     list2 += '<li><a href =' + element[1] + ' target="_blank">' + element[0] + '</a>' + remove + edit +'</li>';
                 }
                 if (list2.length > 0)
                     $('#newList').append(list2);
+            }else{
+                $('#newList').append('<li>Add Links to your today\'s list</li>');
             }
         }
     });
 
+    $('#downloadCsv').click(function(){
+        chrome.storage.sync.get(['csvObject'], function(storage) {
+            $('#csvError').empty();
+            var csvObject = storage.csvObject;
+            if(csvObject){
+                var encodedUri = encodeURI(csvObject);
+                var link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "my_data.csv");
+                document.body.appendChild(link); // Required for FF
+                link.click(); // This will download the data file named "my_data.csv".
+            }else{
+                $('#csvError').append('No links present in the revision list yet, create today\'s list first');
+            }
+        })
+    })
+
+    $('#viewList').click(function(){
+        window.open(
+            'view.html',
+            '_blank' // <- This is what makes it open in a new window.
+        );
+    })
+
     $('#listInsert').click(function(){
         $('.center').hide();
         $('#show').show();
+        $('#viewList').show();
+        $('#downloadCsv').show();
         chrome.storage.sync.get(['array', 'listObject'], function(storage) {
             var listObject = storage.listObject[0];
             var name = $('#name').val().toString(); // change if this doesnt works
@@ -95,8 +124,8 @@ $(function(){
                 listObject.arrayOfNameAndLink.push([name, link]);
                 chrome.storage.sync.set({'listObject': [listObject]}, function () {
                 });
-                var edit = '&nbsp;<input type="submit" ' + ' class = "edit-me" value="Edit">'
-                var remove = '&nbsp;<input type="submit" ' + ' class = "remove-me" value="Remove">'
+                var edit = '&nbsp;<input type="submit" ' + ' class = "edit-me" value="Edit" style="float: right">'
+                var remove = '&nbsp;<input type="submit" ' + ' class = "remove-me" value="Remove" style="float: right">'
                 $('#newList').append('<li><a href=' + link + ' target="_blank">' + name + '</a>' + remove + edit +'</li>');
                 $('#name').val('');
                 $('#link').val('');
@@ -108,6 +137,8 @@ $(function(){
     $('#editListInsert').click(function(){
         $('.edit').hide();
         $('#show').show();
+        $('#viewList').show();
+        $('#downloadCsv').show();
         var currentName = $('#editName').val().toString();
         var currentLink = $('#editLink').val().toString();
         currentName = currentName.trim();
@@ -123,8 +154,8 @@ $(function(){
                     break;
                 }
             }
-            var edit = '&nbsp;<input type="submit" ' + ' class = "edit-me" value="Edit">'
-            var remove = '&nbsp;<input type="submit" ' + ' class = "remove-me" value="Remove">'
+            var edit = '&nbsp;<input type="submit" ' + ' class = "edit-me" value="Edit" style="float: right">'
+            var remove = '&nbsp;<input type="submit" ' + ' class = "remove-me" value="Remove" style="float: right">'
             entry.html('<li><a href=' + currentLink + ' target="_blank">' + currentName + '</a>' + remove + edit +'</li>')
             listObject.arrayOfNameAndLink = array;
             chrome.storage.sync.set({'listObject': [listObject]}, function(){})
@@ -143,17 +174,22 @@ $(function(){
     $('#show').on('click', function () {
         $('.center').show();
         $(this).hide();
+        $('#downloadCsv').hide();
+        $('#viewList').hide();
     })
 
     $('#close').on('click', function () {
         $('.center').hide();
         $('#show').show();
-
+        $('#downloadCsv').show();
+        $('#viewList').show();
     })
 
     $('#editClose').on('click', function (){
         $('.edit').hide();
         $('#show').show();
+        $('#downloadCsv').show();
+        $('#viewList').show();
     })
 
 
@@ -165,6 +201,8 @@ $(function(){
         name = name.trim();
         $('.edit').show();
         $('#show').hide();
+        $('#downloadCsv').hide();
+        $('#viewList').hide();
         chrome.storage.sync.get(['listObject'], function(storage){
             var listObject = storage.listObject || [];
             listObject = listObject[0];

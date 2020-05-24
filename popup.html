@@ -2,26 +2,31 @@
 <html>
     <head>
         <title>Spaced Repetition</title>
-        <script src = "jquery-3.5.1.min.js"> </script>
+        <script src = "jquery-3.5.1.min.js"></script>
         <script src="popup.js"></script>
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
     <h1>Spaced Repetition</h1>
-        <ul id = "revisionList">Today's Revision List</ul>
-        <ul id = "newList">Today's List</ul>
+        <ul id="revisionList">Today's Revision List</ul>
+        <ul id="newList">Today's List</ul>
         <div class="center hideform">
             <button id="close" style="float: right;">X</button>
             Name: <br><input type="text" id="name" name="name" class = "input" placeholder="Enter suitable name of the link"><br>
             Link: <br><input type="text" id="link" name="link" class = "input" placeholder="Enter the link which you want to repeat"></br>
-            <input type="submit" id = "listInsert" value="Add">
+            <input type="submit" id = "listInsert" value="Add" style="text-align: center">
         </div>
         <div class = "edit hideform">
             <button id="editClose" style="float: right;">X</button>
             Name: <br><input type="text" id="editName" name="name" class = "editInput" placeholder="Enter suitable name of the link"><br>
             Link: <br><input type="text" id="editLink" name="link" class = "editInput" placeholder="Enter the link which you want to repeat"></br>
-            <input type="submit" id = "editListInsert" value="Save">
+            <input type="submit" id = "editListInsert" value="Save" style="text-align: center">
         </div>
-        <button id="show">Add into List</button>
+        <div class = "wrapper">
+            <button id="show" >Add into List</button>
+            <button id="downloadCsv">Download CSV</button>
+            <button id="viewList" style="text-align: center">View List</button>
+        </div>
+        <h3 id="csvError"></h3>
     </body>
 </html>
