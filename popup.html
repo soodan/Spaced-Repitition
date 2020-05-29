@@ -8,8 +8,8 @@
     </head>
     <body>
     <h1>Spaced Repetition</h1>
-        <ul id="revisionList">Today's Revision List</ul>
-        <ul id="newList">Today's List</ul>
+    <ul id="revisionList"><h3>Today's Revision List</h3></ul>
+    <ul id="newList"><h3>Today's List</h3></ul>
         <div class="center hideform">
             <button id="close" style="float: right;">X</button>
             Name: <br><input type="text" id="name" name="name" class = "input" placeholder="Enter suitable name of the link"><br>
@@ -25,7 +25,8 @@
         <div class = "wrapper">
             <button id="show" >Add into List</button>
             <button id="downloadCsv">Download CSV</button>
-            <button id="viewList" style="text-align: center">View List</button>
+            <button id="viewList" >View List</button><br/>
+            <button id="resetList" style="margin-top: 5px">Reset</button>
         </div>
         <h3 id="csvError"></h3>
     </body>

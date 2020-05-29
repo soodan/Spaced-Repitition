@@ -66,7 +66,7 @@ function updateArray(){
                         break;
                     }
                     revisionDate.setDate(revisionDate.getDate() + fib[fibIndex]);
-                    revisiondate.fibIndex = fibIndex;
+                    array[i].fibIndex = fibIndex;
                     array[i].revisionDate = revisionDate.toJSON();
                 }
             }

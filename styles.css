@@ -32,6 +32,7 @@ h1{
 .wrapper {
     text-align: center;
     float: bottom;
+    margin: 5px;
 }
 
 .button {

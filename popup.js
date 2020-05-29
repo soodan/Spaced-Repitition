@@ -43,7 +43,6 @@ $(function(){
                 }
             }
         }
-        chrome.storage.sync.set({'revisionObjects': revisionObjects},function(){});
         // Retrieve today's list which is to be revised.
         var list = "";
         for(element of revisionItems){
@@ -80,9 +79,10 @@ $(function(){
                 }
                 if (list2.length > 0)
                     $('#newList').append(list2);
-            }else{
-                $('#newList').append('<li>Add Links to your today\'s list</li>');
             }
+        }
+        if(jQuery.isEmptyObject(listObject) || jQuery.isEmptyObject(listObject.arrayOfNameAndLink)){
+            $('#newList').append('<li>Add into today\'s list</li>');
         }
     });
 
@@ -115,9 +115,10 @@ $(function(){
         $('#show').show();
         $('#viewList').show();
         $('#downloadCsv').show();
+        $('#resetList').show();
         chrome.storage.sync.get(['array', 'listObject'], function(storage) {
             var listObject = storage.listObject[0];
-            var name = $('#name').val().toString(); // change if this doesnt works
+            var name = capitalizeFirstLetter($('#name').val().toString()); // change if this doesnt works
             name = name.trim();
             var link = $('#link').val().toString();
             if(!(jQuery.isEmptyObject(name) || jQuery.isEmptyObject(link))) {
@@ -132,6 +133,21 @@ $(function(){
             }
         });
     })
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    $('#resetList').click(function() {
+        if (confirm('All of your past links and current ones will be erased, to have a backup of links please also download the csv, continue to reset?') == true) {
+            chrome.storage.sync.remove('listObject', function () {
+            });
+            chrome.storage.sync.remove('array', function () {
+            });
+            chrome.storage.sync.remove('csvObject', function () {
+            });
+            chrome.storage.sync.remove('csvCount', function () {
+            });
+        }
+    })
     var entry, prevName, prevLink;
     // ??
     $('#editListInsert').click(function(){
@@ -139,6 +155,7 @@ $(function(){
         $('#show').show();
         $('#viewList').show();
         $('#downloadCsv').show();
+        $('#resetList').show();
         var currentName = $('#editName').val().toString();
         var currentLink = $('#editLink').val().toString();
         currentName = currentName.trim();
@@ -156,7 +173,8 @@ $(function(){
             }
             var edit = '&nbsp;<input type="submit" ' + ' class = "edit-me" value="Edit" style="float: right">'
             var remove = '&nbsp;<input type="submit" ' + ' class = "remove-me" value="Remove" style="float: right">'
-            entry.html('<li><a href=' + currentLink + ' target="_blank">' + currentName + '</a>' + remove + edit +'</li>')
+            entry.empty();
+            entry.html('<a href=' + currentLink + ' target="_blank">' + currentName + '</a>' + remove + edit);
             listObject.arrayOfNameAndLink = array;
             chrome.storage.sync.set({'listObject': [listObject]}, function(){})
         })
@@ -176,6 +194,7 @@ $(function(){
         $(this).hide();
         $('#downloadCsv').hide();
         $('#viewList').hide();
+        $('#resetList').hide();
     })
 
     $('#close').on('click', function () {
@@ -183,6 +202,7 @@ $(function(){
         $('#show').show();
         $('#downloadCsv').show();
         $('#viewList').show();
+        $('#resetList').show();
     })
 
     $('#editClose').on('click', function (){
@@ -190,9 +210,8 @@ $(function(){
         $('#show').show();
         $('#downloadCsv').show();
         $('#viewList').show();
+        $('#resetList').show();
     })
-
-
 
     $(document).on('click', ".edit-me", function(e){
         entry = $(this).parent();
@@ -203,6 +222,7 @@ $(function(){
         $('#show').hide();
         $('#downloadCsv').hide();
         $('#viewList').hide();
+        $('#resetList').hide();
         chrome.storage.sync.get(['listObject'], function(storage){
             var listObject = storage.listObject || [];
             listObject = listObject[0];
