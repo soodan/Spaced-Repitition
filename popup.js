@@ -51,7 +51,7 @@ $(function(){
         if(list.length > 0)
             $('#revisionList').append(list);
         else
-            $('#revisionList').append('<li>No links to revise today, save those links in your Today\'s list which you want to revise in future.</li>');
+            $('#revisionList').append('<li>No links to revise today, save links in your Today\'s list which you want to revise in future.</li>');
         // Initialize the list object if it is empty.
         if(jQuery.isEmptyObject(listObject)){
             //Add links and names to the today's list
@@ -143,7 +143,7 @@ $(function(){
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
     $('#resetList').click(function() {
-        if (confirm('All of your past links and current ones will be erased, to have a backup of links please also download the csv, continue to reset?') == true) {
+        if (confirm('Confirming this will make all links currently stored disapprear, please make sure you have backup of links by downloading the csv, continue to reset?') == true) {
             chrome.storage.sync.remove('listObject', function () {
             });
             chrome.storage.sync.remove('array', function () {
