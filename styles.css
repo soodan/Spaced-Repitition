@@ -1,6 +1,6 @@
 
 body{
-    min-width: 300px;
+    min-width: 500px;
     min-height: 200px;
 }
 .input{
@@ -41,11 +41,15 @@ h1{
 }
 .remove-me{
     display: none;
+    float: right;
     alignment: right;
+    width: 5em;  height: 1.5em;
 }
 .edit-me{
     display: none;
+    float: right;
     alignment: right;
+    width: 5em;  height: 1.5em;
 }
 li{
     margin: 5px;

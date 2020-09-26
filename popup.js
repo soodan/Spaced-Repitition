@@ -51,7 +51,7 @@ $(function(){
         if(list.length > 0)
             $('#revisionList').append(list);
         else
-            $('#revisionList').append('<li>No Revision Today Yay Create your today\'s list</li>');
+            $('#revisionList').append('<li>No links to revise today, save those links in your Today\'s list which you want to revise in future.</li>');
         // Initialize the list object if it is empty.
         if(jQuery.isEmptyObject(listObject)){
             //Add links and names to the today's list
@@ -72,8 +72,8 @@ $(function(){
             var arrayOfNameAndLink = listObject.arrayOfNameAndLink;
             if(!jQuery.isEmptyObject(arrayOfNameAndLink)) {
                 var list2 = "";
-                var remove = '&nbsp;<input type="submit" ' + ' class = "remove-me" value="Remove" style="float: right">'
-                var edit = '&nbsp;<input type="submit" ' + ' class = "edit-me" value="Edit" style="float: right">'
+                var remove = '&nbsp;<input type="submit" ' + ' class = "remove-me" value="Remove">'
+                var edit = '&nbsp;<input type="submit" ' + ' class = "edit-me" value="Edit">'
                 for (element of arrayOfNameAndLink) {
                     list2 += '<li><a href =' + element[1] + ' target="_blank">' + element[0] + '</a>' + remove + edit +'</li>';
                 }
@@ -82,7 +82,7 @@ $(function(){
             }
         }
         if(jQuery.isEmptyObject(listObject) || jQuery.isEmptyObject(listObject.arrayOfNameAndLink)){
-            $('#newList').append('<li>Add into today\'s list</li>');
+            $('#newList').append('<li id="intro">Add into today\'s list</li>');
         }
     });
 
@@ -117,10 +117,16 @@ $(function(){
         $('#downloadCsv').show();
         $('#resetList').show();
         chrome.storage.sync.get(['array', 'listObject'], function(storage) {
+            location.reload();// refresh
+            var intro = document.getElementById('intro');
+            if(intro!= null)
+                intro.remove();
             var listObject = storage.listObject[0];
             var name = capitalizeFirstLetter($('#name').val().toString()); // change if this doesnt works
             name = name.trim();
+            //$('#link').val(window.location.href);
             var link = $('#link').val().toString();
+
             if(!(jQuery.isEmptyObject(name) || jQuery.isEmptyObject(link))) {
                 listObject.arrayOfNameAndLink.push([name, link]);
                 chrome.storage.sync.set({'listObject': [listObject]}, function () {
@@ -146,6 +152,19 @@ $(function(){
             });
             chrome.storage.sync.remove('csvCount', function () {
             });
+            var newList = document.getElementById('newList');
+            newList.innerHTML = '';
+
+            var h3 = document.createElement("h3");
+            var node = document.createTextNode("Today's List");
+            h3.appendChild(node);
+            newList.appendChild(h3);
+
+            var li = document.createElement("li");
+            var node = document.createTextNode("Add into today's list");
+            li.appendChild(node);
+            newList.appendChild(li);
+            location.reload();
         }
     })
     var entry, prevName, prevLink;
@@ -171,8 +190,8 @@ $(function(){
                     break;
                 }
             }
-            var edit = '&nbsp;<input type="submit" ' + ' class = "edit-me" value="Edit" style="float: right">'
-            var remove = '&nbsp;<input type="submit" ' + ' class = "remove-me" value="Remove" style="float: right">'
+            var edit = '&nbsp;<input type="submit" ' + ' class = "edit-me" value="Edit" >'
+            var remove = '&nbsp;<input type="submit" ' + ' class = "remove-me" value="Remove" >'
             entry.empty();
             entry.html('<a href=' + currentLink + ' target="_blank">' + currentName + '</a>' + remove + edit);
             listObject.arrayOfNameAndLink = array;
@@ -191,6 +210,11 @@ $(function(){
     });
     $('#show').on('click', function () {
         $('.center').show();
+        chrome.tabs.query({'active': true, 'windowId': chrome.windows.WINDOW_ID_CURRENT},
+            function(tabs){
+                $('#link').val(tabs[0].url);
+            }
+        );
         $(this).hide();
         $('#downloadCsv').hide();
         $('#viewList').hide();
