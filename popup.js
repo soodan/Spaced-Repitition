@@ -51,7 +51,7 @@ $(function(){
         if(list.length > 0)
             $('#revisionList').append(list);
         else
-            $('#revisionList').append('<li>No links to revise today, save links in your Today\'s list which you want to revise in future.</li>');
+            $('#revisionList').append('<li>No links to revise today, add links in your Today\'s list which you want to revise in future.</li>');
         // Initialize the list object if it is empty.
         if(jQuery.isEmptyObject(listObject)){
             //Add links and names to the today's list
@@ -82,7 +82,7 @@ $(function(){
             }
         }
         if(jQuery.isEmptyObject(listObject) || jQuery.isEmptyObject(listObject.arrayOfNameAndLink)){
-            $('#newList').append('<li id="intro">Add into today\'s list</li>');
+            $('#newList').append('<li id="intro">Add a link into today\'s list  to revise in future</li>');
         }
     });
 
@@ -161,7 +161,7 @@ $(function(){
             newList.appendChild(h3);
 
             var li = document.createElement("li");
-            var node = document.createTextNode("Add into today's list");
+            var node = document.createTextNode("Add a link into today's list to revise in future");
             li.appendChild(node);
             newList.appendChild(li);
             location.reload();
