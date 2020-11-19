@@ -23,14 +23,14 @@ function viewList(){
                 var nextRevisionDate = new Date(array[i].revisionDate);
                 var day = originalDate.getDate();
                 var month = originalDate.getMonth() + 1;
-                if(parseInt(month) <= 10){
+                if(parseInt(month) < 10){
                     month = "0" + month;
                 }
                 var year = originalDate.getFullYear();
                 var dateString = day + "/" + month + "/" + year;
                 day = nextRevisionDate.getDate();
                 month = nextRevisionDate.getMonth() + 1;
-                if(parseInt(month) <= 10){
+                if(parseInt(month) < 10){
                     month = "0" + month;
                 }
                 year = nextRevisionDate.getFullYear();
